@@ -1,0 +1,113 @@
+
+--------------------
+Portofolio Exercise DS Batch 7
+
+by: Martha Dwi Mardyancilatia
+------------------------------
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(ggplot2)
+library(plotly)
+```
+
+```{r}
+df = read.csv('supermarket_sales - Sheet1.csv') #open data
+df
+```
+```{r}
+summary(df) #melihat summary data
+```
+```{r}
+df %>% is.na() %>% colSums() #melihat missing values dan terlihat idak terdapat missing value
+```
+Dari data dapat dipilih ada beberapa variable yang bida dijadikan target antara lain: Total , gross.income , Rating
+
+
+Menggabungkan data Date dan Time agar lebih mudah dalam analisa data
+```{r}
+df$date_time = mdy_hm(paste(df$Date, df$Time))
+df
+
+```
+melihat karakteristik dari data target
+```{r}
+df %>% 
+  select(Total,gross.income,Rating) %>% 
+  summary()
+```
+Insight:
+1. Rating terendah mendapat nilai 4. kenapa?
+2. Total penjualan tertinggi dan terendah memiliki cukup jauh dengan median. apa faktornya
+3. Pendapatan kotor terkecil memiliki nilai jauh dari median.
+
+Melihat hubungan antara Total penjuakan (cogs) dan Rating
+```{r}
+df %>%
+  ggplot(aes(x = Rating, y = Total, color = factor(Gender))) +
+  geom_point()
+```
+dari scatter plot tidak terlihat korelasi antara rating dan Total belanja dari costumer
+
+Hubungan antara Total dan gross.Income
+```{r}
+df %>%
+  ggplot(aes(x = gross.income, y = Total, color = factor(Customer.type))) +
+  geom_point()
+```
+terlihat korelasi positiv antara Total Penjualan dan Pendapatan kotor dan ini memang sewajarnya, dan untuk total penjualan tinggi kebanyakan merupakan member dari toko.
+
+melihat hubungan antara waktu belanja dan total belanja
+```{r}
+df %>% 
+  ggplot(aes(x=factor(wday(date_time,label = TRUE)),y=Total,fill=Customer.type)) +   geom_boxplot()
+```
+Dari plot diatas terlihat bahwa:
+1. Pada hari weekend Pembelian dari non member meningkat dan rata2 total belanjanya pun lebih tinggi dari member
+2. Pada hari weekday member berrlanja lebih banyak dari pada non member
+```{r}
+df %>%
+  ggplot(aes(x=Customer.type, fill=Gender)) +
+  geom_bar()
+```
+Jumlah Member dan non-member 50:50
+dan jumlah wanita & pria yang member hampir 50:50
+
+```{r}
+#mengetahui persebaran data product.line
+df %>%
+  ggplot(aes(x=Product.line)) +
+  geom_bar()
+```
+
+
+```{r}
+#mengetahui persebaran data Paymen
+df %>%
+  ggplot(aes(x=Payment)) +
+  geom_bar()
+```
+Dari plot diatas terlihat bahwa:
+1.Total pembelian terendah customer membeli produk fashion accessoris, Home and lifestyle, dan Sports and TRavel
+2.Total pembelian tertinggi customer membeli produk fashion accessoris terbanyak, food and beverages dan Home and lifestyle
+
+
+Pada tabel gross income 
+
+```{r}
+df %>%
+  ggplot(aes(x=Total,fill=Payment)) +
+  geom_histogram()
+```
+Dari Tabel di atas dapat terliha bahwa:
+penggunaan metode pembayaran telah merata di berbagai rentang total pembelian
+
+```{r}
+df %>%
+  ggplot(aes(x=Rating,fill=Product.line)) +
+  geom_histogram()
+```
+Rating 4 (terendah) terjadi saat transaksi pembelian Electronic accessories, Fasion Accessories, Food and beverages, Health and Beauty dan Sport and travel, tetapi paling banyak pada food and bebverages
